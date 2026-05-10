@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'IBM Plex Mono', ui-monospace, monospace;
+    --font-display: 'VT323', ui-monospace, monospace;
+
+    --color-bno-bg: #0a0a0a;
+    --color-bno-panel: #111111;
+    --color-bno-card: #1b1b1b;
+    --color-bno-border: #3a3a3a;
+    --color-bno-terminal: #6e7b6e;
+    --color-bno-active: #a5b89a;
+    --color-bno-alarm: #8c2f2f;
+    --color-bno-archive: #bebebe;
+}
+
+@layer base {
+    body {
+        font-family: var(--font-sans);
+        letter-spacing: 0.01em;
+        background-image: radial-gradient(circle at 20% 20%, rgba(90, 110, 90, 0.06), transparent 45%),
+            radial-gradient(circle at 80% 0%, rgba(140, 47, 47, 0.05), transparent 40%);
+    }
+
+    ::selection {
+        background: rgba(165, 184, 154, 0.35);
+        color: #0a0a0a;
+    }
+
+    .crt-overlay {
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.035),
+            rgba(255, 255, 255, 0.035) 1px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 3px
+        );
+        mix-blend-mode: soft-light;
+    }
+
+    .crt-vignette {
+        box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.65);
+    }
+
+    .crt-flicker {
+        animation: bno-flicker 4.5s infinite steps(2, end);
+    }
+
+    .scan-shift {
+        animation: bno-shift 12s linear infinite;
+    }
+
+    .redacted {
+        background: #050505;
+        color: #6e7b6e;
+        padding: 0 4px;
+        border: 1px dashed #3a3a3a;
+        letter-spacing: 0.15em;
+        font-family: var(--font-display);
+    }
+
+    .doc-serif {
+        font-family: 'Times New Roman', 'PT Serif', serif;
+        color: var(--color-bno-archive);
+    }
+
+    .doc-watermark {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 5.5vw, 3.25rem);
+        letter-spacing: 0.22em;
+        opacity: 0.065;
+        transform: rotate(-26deg);
+        text-transform: uppercase;
+        z-index: 1;
+        white-space: nowrap;
+    }
+
+    .doc-shell-corruption-1 .doc-body {
+        filter: contrast(0.93) blur(0.35px);
+    }
+
+    .doc-shell-corruption-2 .doc-body {
+        filter: contrast(0.89) blur(0.65px);
+        opacity: 0.94;
+    }
+
+    .doc-shell-corruption-3 .doc-body {
+        filter: contrast(0.84) blur(0.95px);
+        opacity: 0.89;
+    }
+
+    /* Вывод Markdown (архив) */
+    .archive-md-flow .archive-md-root + .archive-md-root {
+        margin-top: 0.75rem;
+    }
+
+    .archive-md-root :where(p, ul, ol, blockquote, pre, h2, h3) {
+        margin-bottom: 0.65rem;
+    }
+
+    .archive-md-root :where(h2) {
+        font-family: var(--font-display);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 1rem;
+        color: var(--color-bno-active);
+    }
+
+    .archive-md-root :where(h3) {
+        font-size: 0.95rem;
+        color: var(--color-bno-terminal);
+    }
+
+    .archive-md-root :where(ul) {
+        list-style: disc;
+        padding-left: 1.35rem;
+    }
+
+    .archive-md-root :where(ol) {
+        list-style: decimal;
+        padding-left: 1.35rem;
+    }
+
+    .archive-md-root :where(li)::marker {
+        color: var(--color-bno-muted);
+    }
+
+    .archive-md-root :where(blockquote) {
+        border-left: 2px solid var(--color-bno-border);
+        padding-left: 0.75rem;
+        color: var(--color-bno-muted);
+    }
+
+    .archive-md-root :where(pre, code) {
+        font-family: var(--font-sans);
+        font-size: 0.85em;
+    }
+
+    .archive-md-root :where(pre) {
+        border: 1px solid var(--color-bno-border);
+        background: #050505;
+        padding: 0.6rem 0.75rem;
+        overflow-x: auto;
+    }
+
+    .archive-md-root :where(a) {
+        color: var(--color-bno-active);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    /* TipTap / ProseMirror в регистратуре */
+    .registry-tiptap-mount {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .registry-tiptap-mount > * {
+        min-height: inherit;
+        box-sizing: border-box;
+    }
+
+    .registry-tiptap-mount .tiptap,
+    .registry-tiptap-mount .ProseMirror {
+        min-height: inherit;
+        box-sizing: border-box;
+        /* PM checkCSS / корректный перенос строк (совпадает с prosemirror-view/style/prosemirror.css) */
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        user-select: text;
+        -webkit-user-select: text;
+        caret-color: var(--color-bno-active);
+    }
+
+    .registry-prosemirror:focus-visible {
+        outline: 1px dashed var(--color-bno-border);
+        outline-offset: 2px;
+    }
+
+    .registry-prosemirror p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+        color: var(--color-bno-muted);
+        opacity: 0.65;
+        font-style: italic;
+    }
+
+    .registry-prosemirror :where(ul) {
+        list-style: disc;
+        padding-left: 1.25rem;
+    }
+
+    .registry-prosemirror :where(ol) {
+        list-style: decimal;
+        padding-left: 1.25rem;
+    }
+
+    .registry-prosemirror :where(blockquote) {
+        border-left: 2px solid var(--color-bno-border);
+        padding-left: 0.65rem;
+        margin: 0.35rem 0;
+        color: var(--color-bno-muted);
+    }
+
+    .registry-prosemirror :where(pre) {
+        border: 1px solid var(--color-bno-border);
+        background: #050505;
+        padding: 0.5rem;
+        font-family: var(--font-sans);
+        font-size: 0.85em;
+        overflow-x: auto;
+    }
+
+    @keyframes bno-flicker {
+        0% {
+            opacity: 1;
+        }
+        47% {
+            opacity: 0.92;
+        }
+        49% {
+            opacity: 1;
+        }
+        72% {
+            opacity: 0.94;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes bno-shift {
+        0% {
+            transform: translateX(0);
+        }
+        50% {
+            transform: translateX(-1px);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+}
