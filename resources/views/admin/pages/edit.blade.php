@@ -5,21 +5,31 @@
 @php
     $editorTypes = \App\Models\PageType::orderBy('sort')->get(['key', 'name'])->map->only(['key', 'name'])->values();
     $tool = fn (string $key) => "'ed-tool' + (active.$key ? ' on' : '')";
+    // На телефоне колонки показываются вкладками; при ошибке в параметрах сразу открываем их.
+    $metaHasErrors = collect($errors->keys())->contains(fn ($k) => $k !== 'title' && $k !== 'content');
 @endphp
 
 @section('admin')
     <form method="post"
           action="{{ $page->exists ? route('admin.pages.update', $page) : route('admin.pages.store', $type) }}"
-          class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
-          x-data="{ dirty: false }" @input="dirty = true" @submit="dirty = false"
+          class="grid gap-6 pb-20 lg:grid-cols-[minmax(0,1fr)_20rem] lg:pb-0"
+          x-data="{ dirty: false, tab: @js($metaHasErrors ? 'meta' : 'text') }" @input="dirty = true" @submit="dirty = false"
           x-init="window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault() } })">
         @csrf
         @if ($page->exists)
             @method('PUT')
         @endif
 
+        {{-- Вкладки для телефона --}}
+        <div class="grid grid-cols-2 border border-bno-border text-xs uppercase lg:hidden">
+            <button type="button" class="py-2.5" :class="tab === 'text' ? 'bg-bno-active text-black' : 'text-bno-muted'" @click="tab = 'text'">Текст</button>
+            <button type="button" class="py-2.5" :class="tab === 'meta' ? 'bg-bno-active text-black' : 'text-bno-muted'" @click="tab = 'meta'">
+                Параметры @if ($metaHasErrors)<span class="text-bno-alarm">●</span>@endif
+            </button>
+        </div>
+
         {{-- Основная колонка: заголовок и текст --}}
-        <div class="min-w-0">
+        <div class="min-w-0" :class="{ 'max-lg:hidden': tab !== 'text' }">
             <p class="text-[11px] uppercase text-bno-muted">
                 {{ $type->name }}@if ($page->exists && $page->code()) · {{ $page->code() }}@endif
                 @if ($page->exists)
@@ -27,7 +37,7 @@
                 @endif
             </p>
             <input name="title" value="{{ old('title', $page->title) }}" required placeholder="Название"
-                   class="mt-1 w-full border-0 border-b border-bno-border bg-transparent py-2 font-serif text-3xl text-bno-archive outline-none focus:border-bno-active">
+                   class="mt-1 w-full border-0 border-b border-bno-border bg-transparent py-2 font-serif text-2xl md:text-3xl text-bno-archive outline-none focus:border-bno-active">
             @error('title')<p class="field-error">{{ $message }}</p>@enderror
 
             <div class="mt-5" data-block-editor
@@ -53,7 +63,9 @@
                     <span class="ed-sep"></span>
                     <div class="relative">
                         <button type="button" class="ed-tool !text-bno-active" @mousedown.prevent @click="insertOpen = !insertOpen" @click.outside="insertOpen = false">+ Блок</button>
-                        <div x-show="insertOpen" x-cloak class="absolute left-0 z-30 mt-1 w-64 border border-bno-border bg-bno-panel py-1 text-xs">
+                        <div x-show="insertOpen" x-cloak class="fixed inset-0 z-40 bg-black/60 md:hidden" @click="insertOpen = false"></div>
+                        <div x-show="insertOpen" x-cloak class="ed-insert-menu">
+                            <p class="border-b border-bno-border px-3 py-2 text-[11px] uppercase text-bno-muted md:hidden">Вставить блок</p>
                             @foreach ([
                                 ['collapsible', 'Раскрывающийся блок', 'приложения, протоколы'],
                                 ['restricted', 'Ограниченный доступ', 'скрыт до «проверки допуска»'],
@@ -119,7 +131,7 @@
         </div>
 
         {{-- Боковая колонка: публикация и поля типа --}}
-        <aside class="space-y-5">
+        <aside class="space-y-5" :class="{ 'max-lg:hidden': tab !== 'meta' }">
             <div class="space-y-3 border border-bno-border bg-bno-panel p-4">
                 <div>
                     <label class="field-label" for="status">Статус</label>
@@ -135,7 +147,7 @@
                         <input id="note" name="note" value="{{ old('note') }}" placeholder="что изменилось" class="field-input">
                     </div>
                 @endif
-                <div class="flex flex-wrap gap-2 pt-1">
+                <div class="hidden flex-wrap gap-2 pt-1 lg:flex">
                     <button class="btn btn-primary" name="after" value="edit">Сохранить</button>
                     <button class="btn" name="after" value="view">Сохранить и открыть</button>
                 </div>
@@ -189,6 +201,15 @@
                 </div>
             @endif
         </aside>
+
+        {{-- Нижняя панель на телефоне: сохранение всегда под рукой --}}
+        <div class="fixed inset-x-0 bottom-0 z-[15] flex gap-2 border-t border-bno-border bg-bno-panel/95 px-3 pt-2 backdrop-blur lg:hidden"
+             style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))">
+            <span class="mr-auto self-center text-[11px] uppercase" :class="dirty ? 'text-bno-warn' : 'text-bno-muted'"
+                  x-text="dirty ? 'Есть изменения' : 'Сохранено'">{{ $page->exists ? 'Сохранено' : 'Новая' }}</span>
+            <button class="btn" name="after" value="view" title="Сохранить и открыть на сайте">Сохр. и открыть</button>
+            <button class="btn btn-primary" name="after" value="edit">Сохранить</button>
+        </div>
     </form>
 
     @if ($page->exists)

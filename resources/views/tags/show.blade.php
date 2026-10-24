@@ -4,7 +4,7 @@
 
 @section('content')
     <p class="text-[11px] uppercase text-bno-muted"><a href="{{ route('tags.index') }}" class="hover:text-bno-active">Теги</a> /</p>
-    <h1 class="mt-1 font-display text-4xl uppercase tracking-[0.2em] text-bno-active">{{ $tag->name }}</h1>
+    <h1 class="mt-1 font-display text-3xl md:text-4xl uppercase tracking-[0.2em] text-bno-active">{{ $tag->name }}</h1>
 
     @forelse ($pages as $group => $items)
         <section class="mt-6">

@@ -25,3 +25,9 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# iOS: проект генерируется XcodeGen, сборка — в CI
+/ios/*.xcodeproj
+/ios/build
+/ios/Payload
+/ios/*.ipa

@@ -29,6 +29,42 @@ php artisan serve
 
 Для разработки с пересборкой фронтенда на лету: `composer dev`.
 
+## Развёртывание на сервере
+
+Нужен VPS с **Ubuntu 22.04 или 24.04**: 1 ядро, 1 ГБ памяти, 10 ГБ диска (Timeweb Cloud, Selectel, Aeza и т. п.), плюс домен с A-записью на IP сервера.
+
+**Первая установка** — одна команда на сервере (по SSH под root):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/qniman/BNO/master/deploy/install.sh | sudo bash -s -- --domain archive.example.ru --email you@example.ru --admin you@example.ru
+```
+
+Скрипт ставит PHP 8.4, nginx, Composer и Node.js, скачивает сайт в `/var/www/bno`, настраивает базу, получает HTTPS-сертификат и включает файрвол. В конце выводит пароль администратора — сохраните его. Без `--domain` сайт откроется по IP без HTTPS. С `--demo` загрузятся демо-страницы.
+
+**Обновление** вручную:
+
+```bash
+sudo bash /var/www/bno/deploy/deploy.sh
+```
+
+**Автоматическое обновление** при пуше в `master` — через GitHub Actions (`.github/workflows/deploy.yml`):
+
+1. На своём компьютере создайте ключ: `ssh-keygen -t ed25519 -f bno_deploy -N ""`.
+2. Добавьте открытый ключ на сервер: содержимое `bno_deploy.pub` → в конец `/root/.ssh/authorized_keys`.
+3. В GitHub: Settings → Secrets and variables → Actions → New repository secret:
+   - `SSH_HOST` — IP или домен сервера;
+   - `SSH_USER` — `root`;
+   - `SSH_KEY` — содержимое закрытого ключа `bno_deploy`;
+   - `SSH_PORT` — если SSH не на 22-м порту.
+
+После этого каждый пуш в `master` прогоняет тесты и обновляет сайт. Пока секреты не заданы, выполняются только тесты.
+
+Новый администратор или смена пароля: `cd /var/www/bno && sudo -u www-data php artisan bno:admin почта@пример.ру`.
+
+## iOS-приложение
+
+В папке [`ios/`](ios/README.md) — приложение-оболочка для iPhone с настройкой адреса сервера. Собирается в GitHub Actions без Mac.
+
 ## Тесты
 
 ```bash

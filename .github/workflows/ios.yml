@@ -1,0 +1,62 @@
+name: iOS-приложение
+
+# Собирает неподписанный BNO.ipa на macOS-машине GitHub.
+# Готовый файл — во вкладке Actions → запуск → Artifacts → BNO-ios.
+# Установить на iPhone с Windows можно через Sideloadly (подпишет вашим Apple ID).
+
+on:
+  push:
+    branches: [master]
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: XcodeGen
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Сборка
+        run: |
+          xcodebuild -version
+          xcodebuild \
+            -project BNO.xcodeproj \
+            -target BNO \
+            -configuration Release \
+            -sdk iphoneos \
+            SYMROOT="$PWD/build" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build > build.log 2>&1 || { grep -E "error:" build.log | head -50; exit 1; }
+          # Предупреждения о делегатах, которые не будут вызваны, — признак несовпадения сигнатур с SDK.
+          grep -E "nearly matches|BUILD SUCCEEDED" build.log || true
+
+      - name: Упаковка .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Release-iphoneos/BNO.app Payload/
+          zip -qry BNO.ipa Payload
+          ls -lh BNO.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BNO-ios
+          path: ios/BNO.ipa
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-log
+          path: ios/build.log

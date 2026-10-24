@@ -3,7 +3,7 @@
         @if ($page->code())
             <p class="text-sm text-bno-active">{{ $page->code() }}</p>
         @endif
-        <h1 class="font-serif text-4xl leading-tight text-bno-archive">{{ $page->title }}</h1>
+        <h1 class="font-serif text-3xl md:text-4xl leading-tight text-bno-archive">{{ $page->title }}</h1>
         @if ($page->summary)
             <p class="mt-3 font-serif text-lg italic leading-relaxed text-bno-terminal">{{ $page->summary }}</p>
         @endif

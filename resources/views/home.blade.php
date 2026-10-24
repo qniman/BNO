@@ -1,9 +1,9 @@
 @extends('layouts.site')
 
 @section('content')
-    <section class="border border-bno-border bg-bno-panel p-6 md:p-8">
+    <section class="border border-bno-border bg-bno-panel p-5 md:p-8">
         <p class="text-[11px] uppercase text-bno-muted">Терминал открытого доступа</p>
-        <h1 class="mt-2 font-display text-4xl uppercase tracking-[0.2em] text-bno-active md:text-5xl">Архив Бюро</h1>
+        <h1 class="mt-2 font-display text-3xl uppercase tracking-[0.2em] text-bno-active md:text-5xl">Архив Бюро</h1>
         <p class="mt-4 max-w-3xl font-serif text-lg leading-relaxed text-bno-archive">
             Бюро нетипичных объектов выявляет, изучает и удерживает предметы, места и явления, которые не укладываются в известную картину мира.
             Здесь собраны рассекреченные материалы: описания объектов, служебные документы и свидетельства.

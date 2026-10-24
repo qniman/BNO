@@ -1,7 +1,26 @@
 @if ($pages->isEmpty())
     <p class="mt-3 border border-dashed border-bno-border p-6 text-center text-sm text-bno-muted">Страниц пока нет.</p>
 @else
-    <div class="mt-3 overflow-x-auto border border-bno-border bg-bno-panel">
+    {{-- Телефон: карточки --}}
+    <ul class="mt-3 space-y-2 md:hidden">
+        @foreach ($pages as $p)
+            <li class="border border-bno-border bg-bno-panel">
+                <a href="{{ route('admin.pages.edit', $p) }}" class="block px-4 py-3 active:bg-bno-card">
+                    <span class="flex items-center gap-2 text-[10px] uppercase text-bno-muted">
+                        {{ $p->type->name }}
+                        <span class="badge {{ $p->status === 'published' ? '!border-bno-active/60 !text-bno-active' : '!border-bno-warn/60 !text-bno-warn' }}">{{ \App\Models\Page::STATUSES[$p->status] ?? $p->status }}</span>
+                        <span class="ml-auto">{{ $p->updated_at->format('d.m H:i') }}</span>
+                    </span>
+                    <span class="mt-1 block text-bno-archive">
+                        @if ($p->code())<span class="text-bno-active">{{ $p->code() }}</span> · @endif{{ $p->title }}
+                    </span>
+                </a>
+            </li>
+        @endforeach
+    </ul>
+
+    {{-- Компьютер: таблица --}}
+    <div class="mt-3 hidden overflow-x-auto border border-bno-border bg-bno-panel md:block">
         <table class="w-full text-sm">
             <thead class="border-b border-bno-border text-left text-[11px] uppercase text-bno-muted">
                 <tr>

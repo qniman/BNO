@@ -1,6 +1,6 @@
 <article class="mx-auto max-w-4xl">
     <header class="border-b border-bno-border pb-5">
-        <h1 class="font-display text-4xl uppercase tracking-[0.15em] text-bno-active">{{ $page->title }}</h1>
+        <h1 class="font-display text-3xl md:text-4xl uppercase tracking-[0.15em] text-bno-active">{{ $page->title }}</h1>
         @if ($page->summary)
             <p class="mt-2 font-serif text-lg text-bno-terminal">{{ $page->summary }}</p>
         @endif

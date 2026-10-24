@@ -3,7 +3,7 @@
 @section('title', 'Поиск')
 
 @section('content')
-    <h1 class="font-display text-4xl uppercase tracking-[0.2em] text-bno-active">Поиск по архиву</h1>
+    <h1 class="font-display text-3xl md:text-4xl uppercase tracking-[0.2em] text-bno-active">Поиск по архиву</h1>
     <form action="{{ route('search') }}" method="get" class="mt-4 flex max-w-2xl gap-2">
         <input type="search" name="q" value="{{ $q }}" autofocus placeholder="Номер, название, слово из текста…" class="field-input">
         <button class="btn btn-primary shrink-0">Найти</button>

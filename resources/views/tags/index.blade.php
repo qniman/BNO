@@ -3,7 +3,7 @@
 @section('title', 'Теги')
 
 @section('content')
-    <h1 class="font-display text-4xl uppercase tracking-[0.2em] text-bno-active">Теги</h1>
+    <h1 class="font-display text-3xl md:text-4xl uppercase tracking-[0.2em] text-bno-active">Теги</h1>
     @if ($tags->isEmpty())
         <p class="mt-6 text-sm text-bno-muted">Тегов пока нет.</p>
     @else

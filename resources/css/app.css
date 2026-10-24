@@ -39,6 +39,20 @@
         background: rgba(165, 184, 154, 0.35);
         color: #0a0a0a;
     }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: rgba(165, 184, 154, 0.15);
+    }
+
+    /* iOS приближает страницу при фокусе на поле со шрифтом меньше 16px */
+    @media (max-width: 767px) {
+        input:not([type='checkbox']):not([type='radio']):not(.text-2xl),
+        select,
+        textarea {
+            font-size: 16px !important;
+        }
+    }
 }
 
 @layer components {
@@ -81,6 +95,34 @@
     .page-link-missing {
         color: var(--color-bno-alarm);
         text-decoration: line-through;
+    }
+
+    /* Вырезы и «чёлка» iPhone (viewport-fit=cover) */
+    .safe-top {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .safe-bottom {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+
+    .safe-x {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+    }
+
+    .icon-btn {
+        display: inline-flex;
+        height: 2.5rem;
+        width: 2.5rem;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-bno-border);
+        color: var(--color-bno-archive);
+    }
+
+    .icon-btn:active {
+        background: var(--color-bno-card);
     }
 
     /* Кнопки и поля админки */
@@ -669,6 +711,79 @@
         border-color: var(--color-bno-active);
         color: var(--color-bno-active);
         background: rgba(165, 184, 154, 0.1);
+    }
+
+    .ed-insert-menu {
+        position: absolute;
+        left: 0;
+        z-index: 30;
+        margin-top: 0.25rem;
+        width: 16rem;
+        border: 1px solid var(--color-bno-border);
+        background: var(--color-bno-panel);
+        padding: 0.25rem 0;
+        font-size: 0.75rem;
+    }
+
+    /* На телефоне панель редактора — одна прокручиваемая строка, меню блоков — шторка снизу */
+    @media (max-width: 767px) {
+        .ed-toolbar {
+            /* под липкой шапкой сайта: 40px логотип + 2×10px отступ + 1px рамка */
+            top: calc(61px + env(safe-area-inset-top));
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .ed-toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ed-tool {
+            flex-shrink: 0;
+            min-width: 2.5rem;
+            min-height: 2.25rem;
+        }
+
+        .ed-insert-menu {
+            position: fixed;
+            inset: auto 0 0 0;
+            z-index: 50;
+            width: auto;
+            max-height: 70vh;
+            overflow-y: auto;
+            margin: 0;
+            border-width: 1px 0 0;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+            font-size: 0.85rem;
+        }
+
+        .ed-insert-menu button {
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+        }
+
+        .ed-content {
+            padding: 1rem 0.9rem 2.5rem;
+            font-size: 1rem;
+        }
+
+        .ed-block-head .ed-input {
+            width: 100% !important;
+            flex: 1 1 100%;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .ed-block-head select.ed-input {
+            flex: 1 1 auto;
+            width: auto !important;
+        }
+
+        .ed-block-body {
+            padding: 0.4rem 0.6rem 0.7rem;
+        }
     }
 
     .ed-sep {

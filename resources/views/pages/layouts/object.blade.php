@@ -3,7 +3,7 @@
         <div class="flex flex-wrap items-end justify-between gap-3 border-b border-bno-border px-5 py-4">
             <div>
                 @if ($page->code())
-                    <p class="font-display text-5xl leading-none tracking-[0.15em] text-bno-active">{{ $page->code() }}</p>
+                    <p class="font-display text-4xl leading-none md:text-5xl tracking-[0.15em] text-bno-active">{{ $page->code() }}</p>
                 @endif
                 <h1 class="mt-2 font-serif text-2xl text-bno-archive">{{ $page->title }}</h1>
             </div>

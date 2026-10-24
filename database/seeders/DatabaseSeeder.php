@@ -13,13 +13,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::updateOrCreate(
+        // Демо-вход только для разработки. На сервере админ создаётся командой `php artisan bno:admin`.
+        $admin = app()->isProduction() ? null : User::updateOrCreate(
             ['email' => 'admin@bno.local'],
             ['name' => 'Регистратор', 'password' => Hash::make('archive-demo'), 'role' => 'admin'],
         );
 
         $types = $this->types();
-        $this->demoPages($types, $admin);
+
+        // Демо-страницы: всегда локально, на сервере — только с BNO_DEMO=1.
+        if (! app()->isProduction() || getenv('BNO_DEMO')) {
+            $this->demoPages($types, $admin);
+        }
     }
 
     /** @return array<string, PageType> */
@@ -82,7 +87,7 @@ class DatabaseSeeder extends Seeder
         return $types;
     }
 
-    private function demoPages(array $types, User $admin): void
+    private function demoPages(array $types, ?User $admin): void
     {
         if (Page::exists()) {
             return;
