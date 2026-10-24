@@ -25,13 +25,13 @@ class SessionController extends Controller
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => __('Указанные учётные данные не совпадают с архивом.'),
+                'email' => __('Неверная почта или пароль.'),
             ]);
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('objects.index'));
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     public function destroy(Request $request): RedirectResponse

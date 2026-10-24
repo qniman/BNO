@@ -1,36 +1,29 @@
-@extends('layouts.archive')
+@extends('layouts.site')
 
 @section('title', 'Вход')
 
 @section('content')
-    <div class="mx-auto max-w-lg border border-bno-border bg-bno-panel p-6">
-        <h1 class="font-display text-3xl uppercase tracking-[0.35em] text-bno-active">Аутентификация</h1>
-        <p class="mt-2 text-xs uppercase text-bno-muted">Используйте учётные данные регистратуры.</p>
+    <div class="mx-auto max-w-md border border-bno-border bg-bno-panel p-6">
+        <h1 class="font-display text-3xl uppercase tracking-[0.3em] text-bno-active">Регистратура</h1>
+        <p class="mt-1 text-[11px] uppercase text-bno-muted">Вход для сотрудников архива</p>
 
-        <form method="post" action="{{ route('login') }}" class="mt-6 space-y-3">
+        <form method="post" action="{{ route('login') }}" class="mt-6 space-y-4">
             @csrf
-            <label class="block text-[11px] uppercase text-bno-muted">
-                УЗ электропочты
-                <input type="email" name="email" value="{{ old('email') }}" required autocomplete="username" class="mt-1 w-full border border-bno-border bg-black px-3 py-2 text-sm text-bno-archive outline-none focus:border-bno-active">
+            <label class="block">
+                <span class="field-label">Почта</span>
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="field-input">
             </label>
-            <label class="block text-[11px] uppercase text-bno-muted">
-                Пароль
-                <input type="password" name="password" required autocomplete="current-password" class="mt-1 w-full border border-bno-border bg-black px-3 py-2 text-sm text-bno-archive outline-none focus:border-bno-active">
+            <label class="block">
+                <span class="field-label">Пароль</span>
+                <input type="password" name="password" required autocomplete="current-password" class="field-input">
             </label>
             <label class="flex items-center gap-2 text-[11px] uppercase text-bno-muted">
-                <input type="checkbox" name="remember" class="border border-bno-border bg-black accent-bno-active">
-                сохранить сеанс
+                <input type="checkbox" name="remember" class="accent-bno-active"> запомнить
             </label>
             @error('email')
-                <p class="text-xs uppercase text-bno-alarm">{{ $message }}</p>
+                <p class="field-error">{{ $message }}</p>
             @enderror
-            <button type="submit" class="w-full border border-bno-active bg-bno-active px-3 py-2 text-xs uppercase text-black hover:bg-transparent hover:text-bno-active">
-                Войти
-            </button>
+            <button type="submit" class="btn btn-primary w-full justify-center">Войти</button>
         </form>
-        <p class="mt-4 text-[11px] uppercase text-bno-muted">
-            Демо: director@bno.local · archive-demo
-        </p>
-        <a href="{{ route('home') }}" class="mt-4 inline-block text-[11px] uppercase text-bno-active hover:underline">← На терминал</a>
     </div>
 @endsection

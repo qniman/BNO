@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
-  <rect width="640" height="360" fill="#0a0a0a"/>
-  <rect x="24" y="24" width="592" height="312" fill="none" stroke="#3a3a3a" stroke-width="2"/>
-  <path d="M80 120 L560 120 M80 200 L560 200 M80 280 L420 280" stroke="#6e7b6e" stroke-width="3" fill="none"/>
-  <circle cx="520" cy="160" r="36" fill="none" stroke="#a5b89a" stroke-width="2"/>
-  <text x="48" y="56" fill="#a5b89a" font-family="monospace" font-size="18">-184 · "&/ !</text>
-  <text x="48" y="340" fill="#8c2f2f" font-family="monospace" font-size="14">( CRC · $ " #" /</text>
-</svg>

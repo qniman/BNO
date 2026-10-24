@@ -1,22 +1,30 @@
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
 @theme {
     --font-sans: 'IBM Plex Mono', ui-monospace, monospace;
     --font-display: 'VT323', ui-monospace, monospace;
+    --font-serif: 'PT Serif', 'Times New Roman', serif;
 
     --color-bno-bg: #0a0a0a;
     --color-bno-panel: #111111;
     --color-bno-card: #1b1b1b;
     --color-bno-border: #3a3a3a;
-    --color-bno-terminal: #6e7b6e;
+    --color-bno-muted: #7d857d;
+    --color-bno-terminal: #8f9b8f;
     --color-bno-active: #a5b89a;
-    --color-bno-alarm: #8c2f2f;
-    --color-bno-archive: #bebebe;
+    --color-bno-alarm: #b04040;
+    --color-bno-warn: #c9a24a;
+    --color-bno-archive: #cfcfc8;
+    --color-bno-paper: #e4dfd2;
+    --color-bno-ink: #1d1b17;
+}
+
+[x-cloak] {
+    display: none !important;
 }
 
 @layer base {
@@ -31,227 +39,805 @@
         background: rgba(165, 184, 154, 0.35);
         color: #0a0a0a;
     }
+}
 
+@layer components {
     .crt-overlay {
         background: repeating-linear-gradient(
             to bottom,
-            rgba(255, 255, 255, 0.035),
-            rgba(255, 255, 255, 0.035) 1px,
-            rgba(0, 0, 0, 0.08) 2px,
-            rgba(0, 0, 0, 0.08) 3px
+            rgba(255, 255, 255, 0.03),
+            rgba(255, 255, 255, 0.03) 1px,
+            rgba(0, 0, 0, 0.07) 2px,
+            rgba(0, 0, 0, 0.07) 3px
         );
         mix-blend-mode: soft-light;
     }
 
     .crt-vignette {
-        box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.65);
-    }
-
-    .crt-flicker {
-        animation: bno-flicker 4.5s infinite steps(2, end);
-    }
-
-    .scan-shift {
-        animation: bno-shift 12s linear infinite;
+        box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.6);
     }
 
     .redacted {
-        background: #050505;
-        color: #6e7b6e;
-        padding: 0 4px;
-        border: 1px dashed #3a3a3a;
-        letter-spacing: 0.15em;
-        font-family: var(--font-display);
+        background: #000;
+        color: #000;
+        box-shadow: inset 0 0 0 1px #3a3a3a;
+        padding: 0 2px;
+        letter-spacing: -0.05em;
+        user-select: none;
+        cursor: not-allowed;
     }
 
-    .doc-serif {
-        font-family: 'Times New Roman', 'PT Serif', serif;
+    .page-link {
+        color: var(--color-bno-active);
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 3px;
+    }
+
+    .page-link:hover {
+        text-decoration-style: solid;
+    }
+
+    .page-link-missing {
+        color: var(--color-bno-alarm);
+        text-decoration: line-through;
+    }
+
+    /* Кнопки и поля админки */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid var(--color-bno-border);
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--color-bno-archive);
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        border-color: var(--color-bno-active);
+        color: var(--color-bno-active);
+    }
+
+    .btn-primary {
+        background: var(--color-bno-active);
+        border-color: var(--color-bno-active);
+        color: #000;
+    }
+
+    .btn-primary:hover {
+        background: transparent;
+    }
+
+    .btn-danger {
+        border-color: rgba(176, 64, 64, 0.6);
+        color: var(--color-bno-alarm);
+    }
+
+    .btn-danger:hover {
+        border-color: var(--color-bno-alarm);
+        color: #e07070;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--color-bno-muted);
+        margin-bottom: 0.25rem;
+    }
+
+    .field-input {
+        width: 100%;
+        border: 1px solid var(--color-bno-border);
+        background: #000;
+        padding: 0.45rem 0.65rem;
+        font-size: 0.875rem;
+        color: var(--color-bno-archive);
+        outline: none;
+    }
+
+    .field-input:focus {
+        border-color: var(--color-bno-active);
+    }
+
+    .field-error {
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--color-bno-alarm);
+    }
+
+    .field-help {
+        margin-top: 0.25rem;
+        font-size: 0.7rem;
+        color: var(--color-bno-muted);
+    }
+
+    .badge {
+        display: inline-block;
+        border: 1px solid var(--color-bno-border);
+        padding: 0.05rem 0.4rem;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: var(--color-bno-muted);
+    }
+
+    /* ===== Текст страницы (публичный вывод и редактор) ===== */
+    .prose-archive {
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        line-height: 1.7;
         color: var(--color-bno-archive);
     }
 
-    .doc-watermark {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: var(--font-display);
-        font-size: clamp(1.75rem, 5.5vw, 3.25rem);
-        letter-spacing: 0.22em;
-        opacity: 0.065;
-        transform: rotate(-26deg);
+    .prose-archive > * + * {
+        margin-top: 0.9em;
+    }
+
+    .prose-archive :where(h2, h3, h4) {
+        font-family: var(--font-sans);
         text-transform: uppercase;
-        z-index: 1;
-        white-space: nowrap;
-    }
-
-    .doc-shell-corruption-1 .doc-body {
-        filter: contrast(0.93) blur(0.35px);
-    }
-
-    .doc-shell-corruption-2 .doc-body {
-        filter: contrast(0.89) blur(0.65px);
-        opacity: 0.94;
-    }
-
-    .doc-shell-corruption-3 .doc-body {
-        filter: contrast(0.84) blur(0.95px);
-        opacity: 0.89;
-    }
-
-    /* Вывод Markdown (архив) */
-    .archive-md-flow .archive-md-root + .archive-md-root {
-        margin-top: 0.75rem;
-    }
-
-    .archive-md-root :where(p, ul, ol, blockquote, pre, h2, h3) {
-        margin-bottom: 0.65rem;
-    }
-
-    .archive-md-root :where(h2) {
-        font-family: var(--font-display);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        font-size: 1rem;
+        letter-spacing: 0.08em;
         color: var(--color-bno-active);
+        line-height: 1.3;
+        margin-top: 1.6em;
     }
 
-    .archive-md-root :where(h3) {
+    .prose-archive :where(h2) {
+        font-size: 1.05rem;
+        border-bottom: 1px solid var(--color-bno-border);
+        padding-bottom: 0.3rem;
+    }
+
+    .prose-archive :where(h3) {
         font-size: 0.95rem;
+    }
+
+    .prose-archive :where(h4) {
+        font-size: 0.85rem;
         color: var(--color-bno-terminal);
     }
 
-    .archive-md-root :where(ul) {
+    .prose-archive :where(ul) {
         list-style: disc;
-        padding-left: 1.35rem;
+        padding-left: 1.5rem;
     }
 
-    .archive-md-root :where(ol) {
+    .prose-archive :where(ol) {
         list-style: decimal;
-        padding-left: 1.35rem;
+        padding-left: 1.5rem;
     }
 
-    .archive-md-root :where(li)::marker {
-        color: var(--color-bno-muted);
+    .prose-archive :where(li + li) {
+        margin-top: 0.3em;
     }
 
-    .archive-md-root :where(blockquote) {
-        border-left: 2px solid var(--color-bno-border);
-        padding-left: 0.75rem;
-        color: var(--color-bno-muted);
+    .prose-archive :where(li > p) {
+        margin: 0;
     }
 
-    .archive-md-root :where(pre, code) {
+    .prose-archive :where(blockquote) {
+        border-left: 3px solid var(--color-bno-border);
+        padding-left: 1rem;
+        color: var(--color-bno-terminal);
+        font-style: italic;
+    }
+
+    .prose-archive :where(a:not(.page-link)) {
+        color: var(--color-bno-active);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .prose-archive :where(code) {
         font-family: var(--font-sans);
         font-size: 0.85em;
+        background: #000;
+        padding: 0.05em 0.3em;
     }
 
-    .archive-md-root :where(pre) {
+    .prose-archive :where(pre) {
         border: 1px solid var(--color-bno-border);
         background: #050505;
-        padding: 0.6rem 0.75rem;
+        padding: 0.75rem 1rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .prose-archive :where(pre code) {
+        background: none;
+        padding: 0;
+    }
+
+    .prose-archive :where(hr) {
+        border: 0;
+        border-top: 1px dashed var(--color-bno-border);
+        margin: 2em 0;
+    }
+
+    .prose-archive :where(table) {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+    }
+
+    .prose-archive :where(th, td) {
+        border: 1px solid var(--color-bno-border);
+        padding: 0.4rem 0.6rem;
+        vertical-align: top;
+        text-align: left;
+    }
+
+    .prose-archive :where(th) {
+        background: rgba(255, 255, 255, 0.04);
+        font-family: var(--font-sans);
+        font-size: 0.8em;
+        text-transform: uppercase;
+        color: var(--color-bno-terminal);
+    }
+
+    .prose-archive :where(th p, td p) {
+        margin: 0;
+    }
+
+    .blk-table {
         overflow-x: auto;
     }
 
-    .archive-md-root :where(a) {
+    /* Раскрывающийся блок */
+    .blk-collapsible {
+        border: 1px solid var(--color-bno-border);
+        background: rgba(0, 0, 0, 0.35);
+    }
+
+    .blk-collapsible > summary {
+        cursor: pointer;
+        padding: 0.55rem 0.9rem;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
         color: var(--color-bno-active);
-        text-decoration: underline;
-        text-underline-offset: 2px;
+        list-style: none;
     }
 
-    /* TipTap / ProseMirror в регистратуре */
-    .registry-tiptap-mount {
+    .blk-collapsible > summary::before {
+        content: '+ ';
+    }
+
+    .blk-collapsible[open] > summary::before {
+        content: '− ';
+    }
+
+    .blk-collapsible > .blk-body {
+        padding: 0.25rem 1rem 1rem;
+        border-top: 1px dashed var(--color-bno-border);
+    }
+
+    .blk-body > * + * {
+        margin-top: 0.8em;
+    }
+
+    .blk-body > :first-child {
+        margin-top: 0.6em;
+    }
+
+    /* Ограниченный доступ */
+    .blk-restricted {
+        border: 1px solid rgba(176, 64, 64, 0.5);
+        background: repeating-linear-gradient(-45deg, rgba(176, 64, 64, 0.05) 0 10px, transparent 10px 20px);
+    }
+
+    .blk-restricted > header {
+        padding: 0.45rem 0.9rem;
+        background: rgba(176, 64, 64, 0.15);
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #e07070;
+    }
+
+    .blk-restricted-lock {
+        padding: 1rem 0.9rem;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        color: var(--color-bno-muted);
+    }
+
+    .blk-restricted-lock button {
+        margin-top: 0.6rem;
+        border: 1px solid rgba(176, 64, 64, 0.6);
+        padding: 0.35rem 0.8rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #e07070;
+        cursor: pointer;
+    }
+
+    .blk-restricted-lock button:hover {
+        background: rgba(176, 64, 64, 0.15);
+    }
+
+    .blk-restricted > .blk-body {
+        padding: 0.2rem 1rem 1rem;
+    }
+
+    /* Документ-вставка: бумажный бланк */
+    .blk-doc {
+        background: var(--color-bno-paper);
+        color: var(--color-bno-ink);
+        padding: 1.2rem 1.4rem;
+        box-shadow: 0 2px 0 #000, 0 0 0 1px #000;
+    }
+
+    .blk-doc > header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+        padding-bottom: 0.6rem;
+        text-align: center;
+    }
+
+    .blk-doc-kind {
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+    }
+
+    .blk-doc-title {
+        font-weight: 700;
+    }
+
+    .blk-doc-meta {
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        color: #5a554a;
+    }
+
+    .blk-doc :where(h2, h3, h4) {
+        color: var(--color-bno-ink);
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .blk-doc :where(a:not(.page-link)),
+    .blk-doc .page-link {
+        color: #2c4a7a;
+    }
+
+    .blk-doc :where(th, td) {
+        border-color: rgba(0, 0, 0, 0.35);
+    }
+
+    .blk-doc :where(th) {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--color-bno-ink);
+    }
+
+    .blk-doc :where(blockquote) {
+        color: #3d3a33;
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Врезки */
+    .blk-callout {
+        border-left: 3px solid var(--color-bno-active);
+        background: rgba(165, 184, 154, 0.06);
+        padding: 0.6rem 1rem 0.8rem;
+    }
+
+    .blk-callout > header {
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-bno-active);
+    }
+
+    .blk-callout-warning {
+        border-color: var(--color-bno-warn);
+        background: rgba(201, 162, 74, 0.07);
+    }
+
+    .blk-callout-warning > header {
+        color: var(--color-bno-warn);
+    }
+
+    .blk-callout-danger {
+        border-color: var(--color-bno-alarm);
+        background: rgba(176, 64, 64, 0.08);
+    }
+
+    .blk-callout-danger > header {
+        color: #e07070;
+    }
+
+    /* Изображения */
+    .blk-image {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .blk-image img {
         width: 100%;
-        min-width: 0;
+        border: 1px solid var(--color-bno-border);
+        filter: grayscale(0.25) contrast(1.05);
     }
 
-    .registry-tiptap-mount > * {
-        min-height: inherit;
-        box-sizing: border-box;
+    .blk-image figcaption {
+        margin-top: 0.35rem;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        color: var(--color-bno-muted);
+        text-align: center;
     }
 
-    .registry-tiptap-mount .tiptap,
-    .registry-tiptap-mount .ProseMirror {
-        min-height: inherit;
-        box-sizing: border-box;
-        /* PM checkCSS / корректный перенос строк (совпадает с prosemirror-view/style/prosemirror.css) */
-        white-space: pre-wrap;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        user-select: text;
-        -webkit-user-select: text;
-        caret-color: var(--color-bno-active);
+    .blk-image-half {
+        max-width: 50%;
     }
 
-    .registry-prosemirror:focus-visible {
-        outline: 1px dashed var(--color-bno-border);
-        outline-offset: 2px;
+    .blk-image-small {
+        max-width: 30%;
     }
 
-    .registry-prosemirror p.is-editor-empty:first-child::before {
+    .blk-image-left.blk-image-half,
+    .blk-image-left.blk-image-small {
+        float: left;
+        margin: 0.3rem 1.2rem 0.8rem 0;
+    }
+
+    .blk-image-right.blk-image-half,
+    .blk-image-right.blk-image-small {
+        float: right;
+        margin: 0.3rem 0 0.8rem 1.2rem;
+    }
+
+    @media (max-width: 640px) {
+        .blk-image-half,
+        .blk-image-small {
+            max-width: 100%;
+            float: none !important;
+            margin: 0 !important;
+        }
+    }
+
+    /* Списки и карточки страниц */
+    .blk-pagelist {
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+    }
+
+    .blk-pagelist ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .blk-pagelist li + li {
+        margin-top: 0;
+    }
+
+    .blk-card {
+        display: block;
+        border: 1px solid var(--color-bno-border);
+        background: var(--color-bno-card);
+        padding: 0.75rem 1rem;
+        font-family: var(--font-sans);
+    }
+
+    .blk-card-missing {
+        color: var(--color-bno-alarm);
+        font-size: 0.8rem;
+    }
+
+    /* Сноски */
+    .blk-footnote a {
+        font-family: var(--font-sans);
+        font-size: 0.7em;
+        color: var(--color-bno-active);
+        text-decoration: none;
+    }
+
+    .blk-footnotes {
+        margin-top: 2.5rem;
+        border-top: 1px solid var(--color-bno-border);
+        padding-top: 0.8rem;
+        font-size: 0.85rem;
+        color: var(--color-bno-terminal);
+    }
+
+    .blk-footnotes h2 {
+        margin-top: 0;
+        border: 0;
+        font-size: 0.75rem;
+        color: var(--color-bno-muted);
+    }
+
+    .blk-footnotes ol {
+        list-style: decimal;
+        padding-left: 1.5rem;
+    }
+
+    .blk-footnote-back {
+        color: var(--color-bno-muted);
+        text-decoration: none;
+    }
+
+    /* Шаблон «Документ»: страница целиком на бланке */
+    .paper-sheet {
+        background: var(--color-bno-paper);
+        color: var(--color-bno-ink);
+        box-shadow: 0 0 0 1px #000, 0 12px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .paper-sheet .prose-archive {
+        color: var(--color-bno-ink);
+    }
+
+    .paper-sheet .prose-archive :where(h2, h3, h4) {
+        color: var(--color-bno-ink);
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .paper-sheet .prose-archive :where(a:not(.page-link)),
+    .paper-sheet .page-link {
+        color: #2c4a7a;
+    }
+
+    .paper-sheet .prose-archive :where(th, td) {
+        border-color: rgba(0, 0, 0, 0.35);
+    }
+
+    .paper-sheet .prose-archive :where(th) {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--color-bno-ink);
+    }
+
+    .paper-sheet .prose-archive :where(blockquote) {
+        color: #3d3a33;
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .paper-sheet .prose-archive :where(code, pre) {
+        background: rgba(0, 0, 0, 0.07);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .paper-sheet .blk-collapsible,
+    .paper-sheet .blk-card {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .paper-sheet .blk-collapsible > summary {
+        color: var(--color-bno-ink);
+    }
+
+    .paper-sheet .blk-footnotes {
+        color: #3d3a33;
+        border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .stamp {
+        display: inline-block;
+        border: 3px double currentColor;
+        padding: 0.2rem 0.7rem;
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: #9b2a2a;
+        transform: rotate(-4deg);
+        opacity: 0.85;
+    }
+
+    /* ===== Редактор ===== */
+    .ed-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        border: 1px solid var(--color-bno-border);
+        border-bottom: 0;
+        background: #0d0d0d;
+        padding: 0.3rem;
+    }
+
+    .ed-tool {
+        min-width: 1.9rem;
+        border: 1px solid transparent;
+        padding: 0.2rem 0.45rem;
+        font-size: 0.75rem;
+        color: var(--color-bno-terminal);
+        cursor: pointer;
+    }
+
+    .ed-tool:hover {
+        border-color: var(--color-bno-border);
+        color: var(--color-bno-active);
+    }
+
+    .ed-tool.on {
+        border-color: var(--color-bno-active);
+        color: var(--color-bno-active);
+        background: rgba(165, 184, 154, 0.1);
+    }
+
+    .ed-sep {
+        width: 1px;
+        margin: 0 0.25rem;
+        background: var(--color-bno-border);
+    }
+
+    .ed-surface {
+        border: 1px solid var(--color-bno-border);
+        background: var(--color-bno-panel);
+    }
+
+    .ed-content {
+        min-height: 420px;
+        padding: 1.25rem 1.5rem 3rem;
+        outline: none;
+    }
+
+    .ed-content p.is-editor-empty:first-child::before {
         content: attr(data-placeholder);
         float: left;
         height: 0;
         pointer-events: none;
         color: var(--color-bno-muted);
-        opacity: 0.65;
         font-style: italic;
     }
 
-    .registry-prosemirror :where(ul) {
-        list-style: disc;
-        padding-left: 1.25rem;
+    .ed-content .ed-redacted {
+        background: #000;
+        color: #8a8a8a;
+        outline: 1px dashed #555;
     }
 
-    .registry-prosemirror :where(ol) {
-        list-style: decimal;
-        padding-left: 1.25rem;
+    .ed-content .ed-page-link {
+        color: var(--color-bno-active);
+        text-decoration: underline dotted;
+        text-underline-offset: 3px;
     }
 
-    .registry-prosemirror :where(blockquote) {
-        border-left: 2px solid var(--color-bno-border);
-        padding-left: 0.65rem;
-        margin: 0.35rem 0;
+    .ed-content a:not(.ed-page-link) {
+        color: #8fb3d9;
+        text-decoration: underline;
+    }
+
+    .ed-content .selectedCell {
+        background: rgba(165, 184, 154, 0.12);
+    }
+
+    .ed-footnote {
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 0.65em;
+        color: var(--color-bno-active);
+    }
+
+    .ed-block {
+        border: 1px dashed var(--color-bno-border);
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .ed-block.ProseMirror-selectednode {
+        outline: 2px solid var(--color-bno-active);
+    }
+
+    .ed-block-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.5rem;
+        border-bottom: 1px dashed var(--color-bno-border);
+        background: rgba(255, 255, 255, 0.03);
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+    }
+
+    .ed-block-label {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-bno-active);
+        margin-right: 0.25rem;
+    }
+
+    .ed-block-remove {
+        margin-left: auto;
+        padding: 0 0.4rem;
+        font-size: 1rem;
+        color: var(--color-bno-muted);
+        cursor: pointer;
+    }
+
+    .ed-block-remove:hover {
+        color: var(--color-bno-alarm);
+    }
+
+    .ed-input {
+        border: 1px solid var(--color-bno-border);
+        background: #000;
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+        color: var(--color-bno-archive);
+        outline: none;
+    }
+
+    .ed-input:focus {
+        border-color: var(--color-bno-active);
+    }
+
+    .ed-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
         color: var(--color-bno-muted);
     }
 
-    .registry-prosemirror :where(pre) {
-        border: 1px solid var(--color-bno-border);
-        background: #050505;
-        padding: 0.5rem;
+    .ed-block-body {
+        padding: 0.4rem 0.9rem 0.8rem;
+    }
+
+    .ed-block-body > * + * {
+        margin-top: 0.8em;
+    }
+
+    .ed-block-preview {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 0.9rem;
         font-family: var(--font-sans);
-        font-size: 0.85em;
-        overflow-x: auto;
+        font-size: 0.8rem;
+        color: var(--color-bno-muted);
     }
 
-    @keyframes bno-flicker {
-        0% {
-            opacity: 1;
-        }
-        47% {
-            opacity: 0.92;
-        }
-        49% {
-            opacity: 1;
-        }
-        72% {
-            opacity: 0.94;
-        }
-        100% {
-            opacity: 1;
-        }
+    .ed-block-preview img {
+        max-height: 220px;
+        max-width: 100%;
+        border: 1px solid var(--color-bno-border);
     }
 
-    @keyframes bno-shift {
-        0% {
-            transform: translateX(0);
-        }
-        50% {
-            transform: translateX(-1px);
-        }
-        100% {
-            transform: translateX(0);
-        }
+    .ed-btn {
+        border: 1px solid var(--color-bno-border);
+        padding: 0.15rem 0.6rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--color-bno-archive);
+        cursor: pointer;
+    }
+
+    .ed-btn:hover {
+        border-color: var(--color-bno-active);
+        color: var(--color-bno-active);
+    }
+
+    .ed-restricted {
+        border-color: rgba(176, 64, 64, 0.6);
+    }
+
+    .ed-restricted .ed-block-label {
+        color: #e07070;
+    }
+
+    .ed-doc .ed-block-body {
+        background: var(--color-bno-paper);
+        color: var(--color-bno-ink);
+    }
+
+    .ed-callout {
+        border-left: 3px solid var(--color-bno-active);
     }
 }

@@ -14,9 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
-            'registry' => \App\Http\Middleware\EnsureRegistryAccess::class,
-        ]);
+        $middleware->redirectGuestsTo(fn () => route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthorizationException $e, Request $request) {
@@ -24,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return response()->view('errors.archive-forbidden', [], 403);
+            return response()->view('errors.403', [], 403);
         });
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
@@ -32,6 +30,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return response()->view('errors.archive-not-found', [], 404);
+            return response()->view('errors.404', [], 404);
         });
     })->create();
